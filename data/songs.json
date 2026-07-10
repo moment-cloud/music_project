@@ -1,0 +1,47 @@
+[
+    {
+        "name": "江南",
+        "artist": "林俊杰",
+        "album": "第二天堂",
+        "duration": 267,
+        "pic": "https://img1.kuwo.cn/star/albumcover/500/s4s60/86/1922632933.jpg",
+        "releaseDate": "2004-06-04",
+        "rid": 93157
+    },
+    {
+        "name": "Always Online",
+        "artist": "林俊杰",
+        "album": "JJ陆",
+        "duration": 225,
+        "pic": "https://img3.kuwo.cn/star/albumcover/500/s4s61/79/3864206498.jpg",
+        "releaseDate": "2008-10-18",
+        "rid": 442546
+    },
+    {
+        "name": "美人鱼",
+        "artist": "林俊杰",
+        "album": "第二天堂",
+        "duration": 254,
+        "pic": "https://img1.kuwo.cn/star/albumcover/500/s4s60/86/1922632933.jpg",
+        "releaseDate": "2004-06-04",
+        "rid": 93151
+    },
+    {
+        "name": "背对背拥抱",
+        "artist": "林俊杰",
+        "album": "100天",
+        "duration": 234,
+        "pic": "https://img4.kuwo.cn/star/albumcover/500/s4s76/56/3735041343.jpg",
+        "releaseDate": "2009-12-18",
+        "rid": 992040
+    },
+    {
+        "name": "关键词",
+        "artist": "林俊杰",
+        "album": "和自己对话 From M.E. To Myself",
+        "duration": 210,
+        "pic": "https://img3.kuwo.cn/star/albumcover/500/55/84/1457166092.jpg",
+        "releaseDate": "2015-12-25",
+        "rid": 6802907
+    }
+]

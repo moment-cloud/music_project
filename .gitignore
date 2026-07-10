@@ -1,0 +1,12 @@
+# Python虚拟环境
+.venv/
+
+# Python缓存
+__pycache__/
+*.pyc
+
+# VS Code配置
+.vscode/
+
+# 私密配置
+crawler/config.py
