@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌曲列表</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .container {
+            width: 900px;
+            max-width: calc(100% - 40px);
+            margin: 30px auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px 0 0 6px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            padding: 10px 22px;
+            border: 0;
+            border-radius: 0 6px 6px 0;
+            background: #222;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .summary {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        .song-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 16px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .cover {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            margin-right: 16px;
+            border-radius: 6px;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        .cover-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .song-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-name {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .song-meta {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .pagination {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            margin: 3px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .pagination .current {
+            background: #222;
+            color: white;
+        }
+
+        .empty {
+            padding: 30px;
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>歌曲列表</h1>
+
+        <form
+            class="search-form"
+            method="get"
+            action="{% url 'music:song_list' %}"
+        >
+            <input
+                class="search-input"
+                type="search"
+                name="q"
+                value="{{ keyword }}"
+                placeholder="搜索歌曲名、歌手名或歌词"
+            >
+            <button class="search-button" type="submit">搜索</button>
+        </form>
+
+        <p class="summary">共找到 {{ result_count }} 首歌曲</p>
+
+        <ul class="song-list">
+            {% for song in page_obj %}
+                <li class="song-item">
+                    {% if song.pic %}
+                        <img
+                            class="cover"
+                            src="{{ song.pic }}"
+                            alt="{{ song.name }}封面"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <div class="cover cover-placeholder">暂无封面</div>
+                    {% endif %}
+
+                    <div class="song-info">
+                        <h2 class="song-name">{{ song.name }}</h2>
+
+                        <p class="song-meta">
+                            歌手：{{ song.singer.name }}<br>
+                            {% if song.album %}
+                                专辑：{{ song.album }}
+                            {% else %}
+                                专辑：暂无信息
+                            {% endif %}
+                        </p>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="empty">没有找到符合条件的歌曲。</li>
+            {% endfor %}
+        </ul>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination" aria-label="歌曲列表分页">
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ keyword|urlencode }}&page=1">首页</a>
+                    <a
+                        href="?q={{ keyword|urlencode }}&page={{ page_obj.previous_page_number }}"
+                    >
+                        上一页
+                    </a>
+                {% endif %}
+
+                <span class="current">
+                    第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a
+                        href="?q={{ keyword|urlencode }}&page={{ page_obj.next_page_number }}"
+                    >
+                        下一页
+                    </a>
+                    <a
+                        href="?q={{ keyword|urlencode }}&page={{ page_obj.paginator.num_pages }}"
+                    >
+                        末页
+                    </a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </main>
+</body>
+</html>
