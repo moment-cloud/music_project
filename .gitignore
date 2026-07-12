@@ -10,3 +10,25 @@ __pycache__/
 
 # 私密配置
 crawler/config.py
+
+# 临时调试和错误日志
+data/lyric_debug.json
+data/*_errors.txt
+
+# 本地数据
+music_web/db.sqlite3
+
+
+# 调试用文件
+crawler/.gitignore
+crawler/analyze_*.py
+crawler/test_*.py
+crawler/saver.py
+
+# 调试用数据
+data/singer_list.json
+data/song_candidates.json
+data/songs.json
+data/*.html
+data/lyric_debug.json
+data/*_errors.txt
