@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ song.name }}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .container {
+            width: 900px;
+            max-width: calc(100% - 40px);
+            margin: 30px auto;
+        }
+
+        .site-nav {
+            margin-bottom: 18px;
+        }
+
+        .site-nav a {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 9px 16px;
+            border-radius: 6px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .site-nav .active {
+            background: #222;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #444;
+            text-decoration: none;
+        }
+
+        .back-link:hover,
+        .text-link:hover {
+            text-decoration: underline;
+        }
+
+        .song-card,
+        .lyrics-card,
+        .comment-card {
+            margin-bottom: 18px;
+            padding: 24px;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .song-header {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .cover {
+            width: 180px;
+            height: 180px;
+            flex-shrink: 0;
+            margin-right: 24px;
+            border-radius: 8px;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        .cover-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            margin: 0 0 18px;
+            font-size: 30px;
+        }
+
+        .song-meta {
+            margin: 8px 0;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .text-link,
+        .source-link {
+            color: #1769aa;
+        }
+
+        .source-link {
+            display: inline-block;
+            margin-top: 12px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .lyrics {
+            line-height: 1.9;
+            white-space: normal;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            font: inherit;
+        }
+
+        .submit-button,
+        .delete-button {
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-button {
+            margin-top: 10px;
+            padding: 10px 22px;
+            background: #222;
+            color: white;
+        }
+
+        .comment-error {
+            color: #b00020;
+        }
+
+        .comment-list {
+            margin: 24px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .comment-item {
+            padding: 16px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .comment-content {
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+
+        .delete-button {
+            padding: 6px 12px;
+            background: #eee;
+            color: #b00020;
+        }
+
+        @media (max-width: 650px) {
+            .song-header {
+                display: block;
+            }
+
+            .cover {
+                width: 140px;
+                height: 140px;
+                margin: 0 0 18px;
+            }
+
+            .comment-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <nav class="site-nav">
+            <a class="active" href="{% url 'music:song_list' %}">歌曲</a>
+            <a href="{% url 'music:singer_list' %}">歌手</a>
+        </nav>
+
+        <a class="back-link" href="{% url 'music:song_list' %}">← 返回歌曲列表</a>
+
+        <section class="song-card">
+            <div class="song-header">
+                {% if song.pic %}
+                    <img class="cover" src="{{ song.pic }}" alt="{{ song.name }}封面">
+                {% else %}
+                    <div class="cover cover-placeholder">暂无封面</div>
+                {% endif %}
+
+                <div class="song-info">
+                    <h1 class="song-title">{{ song.name }}</h1>
+
+                    <p class="song-meta">
+                        <strong>歌手：</strong>
+                        <a
+                            class="text-link"
+                            href="{% url 'music:singer_detail' song.singer.id %}"
+                        >
+                            {{ song.singer.name }}
+                        </a>
+                    </p>
+
+                    <p class="song-meta">
+                        <strong>演唱者：</strong>{{ song.artist }}
+                    </p>
+
+                    <p class="song-meta">
+                        <strong>专辑：</strong>
+                        {% if song.album %}
+                            {{ song.album }}
+                        {% else %}
+                            暂无信息
+                        {% endif %}
+                    </p>
+
+                    {% if song.duration %}
+                        <p class="song-meta">
+                            <strong>时长：</strong>{{ song.duration }} 秒
+                        </p>
+                    {% endif %}
+
+                    <a
+                        class="source-link"
+                        href="{{ song.source_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        打开原歌曲页面
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="lyrics-card">
+            <h2>歌词</h2>
+            <div class="lyrics">{{ song.lyrics|linebreaksbr }}</div>
+        </section>
+
+        <section class="comment-card">
+            <h2>评论</h2>
+
+            <form class="comment-form" method="post">
+                {% csrf_token %}
+
+                <textarea
+                    name="content"
+                    placeholder="请输入评论内容"
+                    required
+                ></textarea>
+
+                {% if comment_error %}
+                    <p class="comment-error">{{ comment_error }}</p>
+                {% endif %}
+
+                <button class="submit-button" type="submit">提交评论</button>
+            </form>
+
+            <ul class="comment-list">
+                {% for comment in comments %}
+                    <li class="comment-item">
+                        <div class="comment-header">
+                            <strong>{{ comment.user }}</strong>
+                            <time>{{ comment.created_at|date:"Y-m-d H:i:s" }}</time>
+                        </div>
+
+                        <p class="comment-content">
+                            {{ comment.content|linebreaksbr }}
+                        </p>
+
+                        <form
+                            method="post"
+                            action="{% url 'music:delete_comment' comment.id %}"
+                        >
+                            {% csrf_token %}
+                            <button
+                                class="delete-button"
+                                type="submit"
+                                onclick="return confirm('确认删除这条评论吗？');"
+                            >
+                                删除
+                            </button>
+                        </form>
+                    </li>
+                {% empty %}
+                    <li class="comment-item">暂无评论。</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

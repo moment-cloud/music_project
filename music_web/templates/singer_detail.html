@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ singer.name }}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .container {
+            width: 900px;
+            max-width: calc(100% - 40px);
+            margin: 30px auto;
+        }
+
+        .site-nav {
+            margin-bottom: 18px;
+        }
+
+        .site-nav a {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 9px 16px;
+            border-radius: 6px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .site-nav .active {
+            background: #222;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: #444;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .singer-card,
+        .description-card,
+        .songs-card {
+            margin-bottom: 18px;
+            padding: 24px;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .singer-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .singer-image {
+            width: 180px;
+            height: 180px;
+            flex-shrink: 0;
+            margin-right: 24px;
+            border-radius: 50%;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        .singer-name {
+            margin: 0 0 18px;
+            font-size: 32px;
+        }
+
+        .source-link {
+            color: #1769aa;
+        }
+
+        .description {
+            line-height: 1.9;
+        }
+
+        .song-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .song-item {
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .song-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .song-link:hover {
+            background: #fafafa;
+        }
+
+        .song-cover {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            margin-right: 14px;
+            border-radius: 5px;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        .song-name {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        @media (max-width: 650px) {
+            .singer-header {
+                display: block;
+            }
+
+            .singer-image {
+                width: 140px;
+                height: 140px;
+                margin: 0 0 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <nav class="site-nav">
+            <a href="{% url 'music:song_list' %}">歌曲</a>
+            <a class="active" href="{% url 'music:singer_list' %}">歌手</a>
+        </nav>
+
+        <a class="back-link" href="{% url 'music:singer_list' %}">
+            ← 返回歌手列表
+        </a>
+
+        <section class="singer-card">
+            <div class="singer-header">
+                <img
+                    class="singer-image"
+                    src="{{ singer.pic }}"
+                    alt="{{ singer.name }}头像"
+                >
+
+                <div>
+                    <h1 class="singer-name">{{ singer.name }}</h1>
+
+                    <a
+                        class="source-link"
+                        href="{{ singer.source_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        打开原歌手页面
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="description-card">
+            <h2>歌手简介</h2>
+            <div class="description">{{ singer.description|linebreaksbr }}</div>
+        </section>
+
+        <section class="songs-card">
+            <h2>系统中的歌曲（{{ songs|length }}首）</h2>
+
+            <ul class="song-list">
+                {% for song in songs %}
+                    <li class="song-item">
+                        <a
+                            class="song-link"
+                            href="{% url 'music:song_detail' song.id %}"
+                        >
+                            {% if song.pic %}
+                                <img
+                                    class="song-cover"
+                                    src="{{ song.pic }}"
+                                    alt="{{ song.name }}封面"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <div class="song-cover"></div>
+                            {% endif %}
+
+                            <h3 class="song-name">{{ song.name }}</h3>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>当前歌手暂无歌曲。</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

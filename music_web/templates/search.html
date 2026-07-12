@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .container {
+            width: 900px;
+            max-width: calc(100% - 40px);
+            margin: 30px auto;
+        }
+
+        .site-nav {
+            margin-bottom: 24px;
+        }
+
+        .site-nav a {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 9px 16px;
+            border-radius: 6px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .site-nav .active {
+            background: #222;
+            color: white;
+        }
+
+        .search-card {
+            margin-bottom: 18px;
+            padding: 24px;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .search-row {
+            display: flex;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 0;
+            padding: 11px 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px 0 0 6px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            padding: 11px 24px;
+            border: 0;
+            border-radius: 0 6px 6px 0;
+            background: #222;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-types {
+            margin-top: 16px;
+        }
+
+        .search-types label {
+            margin-right: 18px;
+            cursor: pointer;
+        }
+
+        .search-error {
+            margin-bottom: 18px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            background: #fff0f0;
+            color: #b00020;
+        }
+
+        .summary {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        .result-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .result-link {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .result-link:hover {
+            background: #fafafa;
+        }
+
+        .result-image {
+            width: 68px;
+            height: 68px;
+            flex-shrink: 0;
+            margin-right: 16px;
+            border-radius: 6px;
+            background: #eee;
+            object-fit: cover;
+        }
+
+        .singer-image {
+            border-radius: 50%;
+        }
+
+        .result-name {
+            margin: 0 0 6px;
+            font-size: 19px;
+        }
+
+        .result-meta {
+            margin: 0;
+            color: #666;
+        }
+
+        .empty {
+            padding: 30px;
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+        }
+
+        .pagination {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            margin: 3px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .pagination .current {
+            background: #222;
+            color: white;
+        }
+
+        .page-jump {
+            display: inline-flex;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .page-input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .page-button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 0 5px 5px 0;
+            background: #222;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <nav class="site-nav">
+            <a href="{% url 'music:song_list' %}">歌曲</a>
+            <a href="{% url 'music:singer_list' %}">歌手</a>
+            <a class="active" href="{% url 'music:search' %}">搜索</a>
+        </nav>
+
+        <h1>搜索</h1>
+
+        <section class="search-card">
+            <form method="get" action="{% url 'music:search' %}">
+                <div class="search-row">
+                    <input
+                        class="search-input"
+                        type="search"
+                        name="q"
+                        value="{{ keyword }}"
+                        maxlength="{{ max_search_length }}"
+                        placeholder="请输入20个字符以内的关键词"
+                        required
+                    >
+                    <button class="search-button" type="submit">搜索</button>
+                </div>
+
+                <div class="search-types">
+                    <label>
+                        <input
+                            type="radio"
+                            name="type"
+                            value="song"
+                            {% if search_type == "song" %}checked{% endif %}
+                        >
+                        搜索歌曲
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="type"
+                            value="singer"
+                            {% if search_type == "singer" %}checked{% endif %}
+                        >
+                        搜索歌手
+                    </label>
+                </div>
+            </form>
+        </section>
+
+        {% if search_error %}
+            <p class="search-error">{{ search_error }}</p>
+        {% endif %}
+
+        {% if submitted and not search_error %}
+            <p class="summary">
+                共找到 {{ result_count }}
+                {% if search_type == "singer" %}名歌手{% else %}首歌曲{% endif %}，
+                后端搜索耗时 {{ elapsed_ms }} 毫秒
+            </p>
+
+            <ul class="result-list">
+                {% if search_type == "singer" %}
+                    {% for singer in page_obj %}
+                        <li class="result-item">
+                            <a
+                                class="result-link"
+                                href="{% url 'music:singer_detail' singer.id %}"
+                            >
+                                <img
+                                    class="result-image singer-image"
+                                    src="{{ singer.pic }}"
+                                    alt="{{ singer.name }}头像"
+                                    loading="lazy"
+                                >
+
+                                <div>
+                                    <h2 class="result-name">{{ singer.name }}</h2>
+                                    <p class="result-meta">歌手</p>
+                                </div>
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="empty">没有找到符合条件的歌手。</li>
+                    {% endfor %}
+                {% else %}
+                    {% for song in page_obj %}
+                        <li class="result-item">
+                            <a
+                                class="result-link"
+                                href="{% url 'music:song_detail' song.id %}"
+                            >
+                                {% if song.pic %}
+                                    <img
+                                        class="result-image"
+                                        src="{{ song.pic }}"
+                                        alt="{{ song.name }}封面"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <div class="result-image"></div>
+                                {% endif %}
+
+                                <div>
+                                    <h2 class="result-name">{{ song.name }}</h2>
+                                    <p class="result-meta">
+                                        歌手：{{ song.singer.name }}
+                                    </p>
+                                </div>
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="empty">没有找到符合条件的歌曲。</li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="pagination" aria-label="搜索结果分页">
+                    {% if page_obj.has_previous %}
+                        <a
+                            href="?q={{ keyword|urlencode }}&type={{ search_type }}&page=1"
+                        >
+                            首页
+                        </a>
+                        <a
+                            href="?q={{ keyword|urlencode }}&type={{ search_type }}&page={{ page_obj.previous_page_number }}"
+                        >
+                            上一页
+                        </a>
+                    {% endif %}
+
+                    {% for page in page_numbers %}
+                        {% if page == page_obj.number %}
+                            <span class="current">{{ page }}</span>
+                        {% else %}
+                            <a
+                                href="?q={{ keyword|urlencode }}&type={{ search_type }}&page={{ page }}"
+                            >
+                                {{ page }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a
+                            href="?q={{ keyword|urlencode }}&type={{ search_type }}&page={{ page_obj.next_page_number }}"
+                        >
+                            下一页
+                        </a>
+                        <a
+                            href="?q={{ keyword|urlencode }}&type={{ search_type }}&page={{ page_obj.paginator.num_pages }}"
+                        >
+                            末页
+                        </a>
+                    {% endif %}
+
+                    <form class="page-jump" method="get">
+                        <input type="hidden" name="q" value="{{ keyword }}">
+                        <input type="hidden" name="type" value="{{ search_type }}">
+                        <input
+                            class="page-input"
+                            type="number"
+                            name="page"
+                            min="1"
+                            max="{{ page_obj.paginator.num_pages }}"
+                            placeholder="页码"
+                            required
+                        >
+                        <button class="page-button" type="submit">跳转</button>
+                    </form>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </main>
+</body>
+</html>

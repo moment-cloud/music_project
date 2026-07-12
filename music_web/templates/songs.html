@@ -23,6 +23,25 @@
             margin: 30px auto;
         }
 
+        .site-nav {
+            margin-bottom: 24px;
+        }
+
+        .site-nav a {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 9px 16px;
+            border-radius: 6px;
+            background: white;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .site-nav .active {
+            background: #222;
+            color: white;
+        }
+
         h1 {
             margin-bottom: 20px;
         }
@@ -63,12 +82,21 @@
         }
 
         .song-item {
-            display: flex;
-            align-items: center;
             margin-bottom: 10px;
-            padding: 16px;
             border-radius: 8px;
             background: white;
+        }
+
+        .song-link {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .song-link:hover {
+            background: #fafafa;
         }
 
         .cover {
@@ -126,6 +154,28 @@
             color: white;
         }
 
+        .page-jump {
+            display: inline-flex;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .page-input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .page-button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 0 5px 5px 0;
+            background: #222;
+            color: white;
+            cursor: pointer;
+        }
+
         .empty {
             padding: 30px;
             border-radius: 8px;
@@ -137,13 +187,15 @@
 
 <body>
     <main class="container">
+        <nav class="site-nav">
+            <a class="active" href="{% url 'music:song_list' %}">歌曲</a>
+            <a href="{% url 'music:singer_list' %}">歌手</a>
+            <a href="{% url 'music:search' %}">搜索</a>
+        </nav>
+
         <h1>歌曲列表</h1>
 
-        <form
-            class="search-form"
-            method="get"
-            action="{% url 'music:song_list' %}"
-        >
+        <form class="search-form" method="get" action="{% url 'music:song_list' %}">
             <input
                 class="search-input"
                 type="search"
@@ -159,29 +211,31 @@
         <ul class="song-list">
             {% for song in page_obj %}
                 <li class="song-item">
-                    {% if song.pic %}
-                        <img
-                            class="cover"
-                            src="{{ song.pic }}"
-                            alt="{{ song.name }}封面"
-                            loading="lazy"
-                        >
-                    {% else %}
-                        <div class="cover cover-placeholder">暂无封面</div>
-                    {% endif %}
+                    <a class="song-link" href="{% url 'music:song_detail' song.id %}">
+                        {% if song.pic %}
+                            <img
+                                class="cover"
+                                src="{{ song.pic }}"
+                                alt="{{ song.name }}封面"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="cover cover-placeholder">暂无封面</div>
+                        {% endif %}
 
-                    <div class="song-info">
-                        <h2 class="song-name">{{ song.name }}</h2>
+                        <div class="song-info">
+                            <h2 class="song-name">{{ song.name }}</h2>
 
-                        <p class="song-meta">
-                            歌手：{{ song.singer.name }}<br>
-                            {% if song.album %}
-                                专辑：{{ song.album }}
-                            {% else %}
-                                专辑：暂无信息
-                            {% endif %}
-                        </p>
-                    </div>
+                            <p class="song-meta">
+                                歌手：{{ song.singer.name }}<br>
+                                {% if song.album %}
+                                    专辑：{{ song.album }}
+                                {% else %}
+                                    专辑：暂无信息
+                                {% endif %}
+                            </p>
+                        </div>
+                    </a>
                 </li>
             {% empty %}
                 <li class="empty">没有找到符合条件的歌曲。</li>
@@ -192,29 +246,41 @@
             <nav class="pagination" aria-label="歌曲列表分页">
                 {% if page_obj.has_previous %}
                     <a href="?q={{ keyword|urlencode }}&page=1">首页</a>
-                    <a
-                        href="?q={{ keyword|urlencode }}&page={{ page_obj.previous_page_number }}"
-                    >
+                    <a href="?q={{ keyword|urlencode }}&page={{ page_obj.previous_page_number }}">
                         上一页
                     </a>
                 {% endif %}
 
-                <span class="current">
-                    第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页
-                </span>
+                {% for page in page_numbers %}
+                    {% if page == page_obj.number %}
+                        <span class="current">{{ page }}</span>
+                    {% else %}
+                        <a href="?q={{ keyword|urlencode }}&page={{ page }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
 
                 {% if page_obj.has_next %}
-                    <a
-                        href="?q={{ keyword|urlencode }}&page={{ page_obj.next_page_number }}"
-                    >
+                    <a href="?q={{ keyword|urlencode }}&page={{ page_obj.next_page_number }}">
                         下一页
                     </a>
-                    <a
-                        href="?q={{ keyword|urlencode }}&page={{ page_obj.paginator.num_pages }}"
-                    >
+                    <a href="?q={{ keyword|urlencode }}&page={{ page_obj.paginator.num_pages }}">
                         末页
                     </a>
                 {% endif %}
+
+                <form class="page-jump" method="get">
+                    <input type="hidden" name="q" value="{{ keyword }}">
+                    <input
+                        class="page-input"
+                        type="number"
+                        name="page"
+                        min="1"
+                        max="{{ page_obj.paginator.num_pages }}"
+                        placeholder="页码"
+                        required
+                    >
+                    <button class="page-button" type="submit">跳转</button>
+                </form>
             </nav>
         {% endif %}
     </main>
