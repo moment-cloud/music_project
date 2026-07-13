@@ -1,34 +1,27 @@
 # Python虚拟环境
 .venv/
+venv/
 
 # Python缓存
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# VS Code配置
+# 编辑器配置
 .vscode/
 
-# 私密配置
+# Windows和macOS系统文件
+Thumbs.db
+.DS_Store
+
+# 爬虫私密请求配置
 crawler/config.py
 
-# 临时调试和错误日志
-data/lyric_debug.json
-data/*_errors.txt
-
-# 本地数据
-music_web/db.sqlite3
-
-
-# 调试用文件
-crawler/.gitignore
-crawler/analyze_*.py
-crawler/test_*.py
-crawler/saver.py
-
-# 调试用数据
-data/singer_list.json
-data/song_candidates.json
-data/songs.json
+# 爬虫生成的数据
+data/*.json
 data/*.html
-data/lyric_debug.json
 data/*_errors.txt
+
+# Django本地数据库
+music_web/db.sqlite3

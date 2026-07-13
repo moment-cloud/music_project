@@ -42,7 +42,6 @@ def load_json(filename: str) -> list[dict]:
         except json.JSONDecodeError:
             return []
 
-
 def save_json(data: list[dict], filename: str) -> None:
     """将数据保存为JSON文件。"""
 
@@ -50,7 +49,6 @@ def save_json(data: list[dict], filename: str) -> None:
 
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=2)
-
 
 def get_artist_songs(singer_id: int) -> list[dict]:
     """调用酷我接口，获取指定歌手的歌曲列表。"""

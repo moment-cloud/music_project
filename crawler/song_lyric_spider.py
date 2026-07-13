@@ -125,7 +125,6 @@ def clean_lyric_line(line: str) -> str:
 
     return re.sub(BRACKET_TAG_PATTERN, "", line).strip()
 
-
 def extract_lyrics(data: dict) -> tuple[str, bool]:
     """提取纯文本歌词，并返回是否识别到接口数据结构。"""
 

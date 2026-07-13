@@ -105,8 +105,7 @@ def main():
 
     seen_ids = set()
 
-    # 最多请求3页。
-    # 正常情况下前2页已经足够得到100名歌手。
+    # 最多请求3页
     for page_number in range(1, 4):
 
         artist_list = get_singer_page(
@@ -126,7 +125,6 @@ def main():
 
             break
 
-
         for artist in artist_list:
 
             singer_id = artist.get("id")
@@ -135,13 +133,10 @@ def main():
             if singer_id is None or not name:
                 continue
 
-
             singer_id = int(singer_id)
-
 
             if singer_id in seen_ids:
                 continue
-
 
             singer = {
                 "id": singer_id,
@@ -160,7 +155,6 @@ def main():
                 )
             }
 
-
             singers.append(singer)
 
             seen_ids.add(singer_id)
@@ -169,23 +163,17 @@ def main():
             if len(singers) >= TARGET_COUNT:
                 break
 
-
         print(
             "当前有效歌手数量:",
             len(singers)
         )
 
-
         if len(singers) >= TARGET_COUNT:
             break
 
-
-        # 课程要求请求之间保留间隔
         time.sleep(1)
 
-
     save_singer_list(singers)
-
 
     print("==============================")
     print("最终歌手数量:", len(singers))
